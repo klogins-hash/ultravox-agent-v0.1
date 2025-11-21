@@ -1,0 +1,10 @@
+# environment variables
+.env
+.env.production
+
+# astro
+node_modules
+docs/*
+
+# macOS-specific files
+.DS_Store

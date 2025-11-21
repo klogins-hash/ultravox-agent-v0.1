@@ -1,0 +1,317 @@
+---
+title: 'Bring Your Own (Key)'
+description: 'How to use Ultravox with your own text-to-speech provider'
+icon: 'user-plus'
+---
+
+Ultravox Realtime allows you to bring your own TTS provider to have your agent sound however you like.
+
+<Note>
+  <b>Advanced Feature</b>
+
+  Integrating your own TTS provider means you're responsible for speech generation issues.
+  You'll need to work with your provider to ensure your requests will be fulfilled reliably and quickly
+  and will sound the way you want. If you encounter generation errors, see [Debugging](#debugging) below.
+</Note>
+
+## Setting up your account
+
+To use your own TTS provider, you'll need to add your API key for that provider to your Ultravox account.
+You can do that in the [Ultravox console](https://app.ultravox.ai/settings/) or using the
+[Set TTS API keys endpoint](/api-reference/accounts/accounts-me-tts-api-keys-partial-update).
+
+<Note>
+  <b>Generic option</b>
+
+  You can skip this step if you're using the "generic" ExternalVoice integration.
+</Note>
+
+## Named Providers
+
+When setting an [ExternalVoice](/api-reference/calls/calls-post#body-external-voice) on your agent or call,
+there are a few different providers available. The named providers such as ElevenLabs and Cartesia have
+customized integrations that make their voices work as smoothly as possible with Ultravox. This typically means
+Ultravox uses their streaming API and takes advantage of audio timing information from the provider to
+synchronize transcripts.  While you'll still need to work with the provider to ensure your agent's requests will
+be fulfilled reliably and quickly, you can be confident that Ultravox knows how to interact with your provider.
+
+If you'd like to use some other TTS provider, you may be able to get by with our [Generic TTS](#generic-tts-options) integration option.
+
+### Cartesia
+
+Cartesia also provides many high quality voices. We use their websocket API to stream text in and audio out in
+parallel. Cartesia provides word-level timing information interspersed with audio, helping to keep transcripts
+in sync with audio.
+
+```json
+"cartesia": {
+  "voiceId": "af346552-54bf-4c2b-a4d4-9d2820f51b6c",
+  "model": "sonic-2"
+}
+```
+
+### Eleven Labs
+
+Eleven Labs is our most commonly used provider (and as of May 2025 backs most of our internal voices). We use
+their websocket API to stream text in and audio out in parallel. Eleven Labs provides character-level timing
+information alongside audio, ensuring transcripts are kept in sync and conversation history accurately reflects
+what was spoken in the event of an interruption.
+
+<Note>
+  <b>Slurring</b>
+
+  Eleven Labs seems much more likely to slur words or generally hallucinate audio in the past couple months.
+  Several of their customers (including Ultravox) have reported this and it is being worked on. In the meantime,
+  prompting your agent to avoid special characters like asterisks may be helpful. Alternatively, you could try
+  their more robust (but slower) multilingual model.
+</Note>
+
+```json
+"elevenLabs": {
+  "voiceId": "21m00Tcm4TlvDq8ikWAM",
+  "model": "eleven_turbo_v2_5"
+}
+```
+
+### LMNT
+
+LMNT's "aurora" model lags the other providers in terms of quality, though their experimental "blizzard" model shows
+potential. LMNT has by far the simplest streaming integration (and the only SDK worth using). They also offer unlimited
+concurrency and no rate limits even on their $10/month plan. Like Eleven Labs and Cartesia, LMNT allows for streaming
+text in and audio out in parallel and provides audio timing information to help Ultravox align transcripts with speech.
+
+```json
+"lmnt": {
+  "voiceId": "lily",
+  "model": "blizzard"
+}
+```
+
+
+## Generic TTS Options
+
+The "generic" TTS route gives you much more flexibility to define requests to your provider. Any provider that accepts json
+post requests and that returns either WAV or raw PCM audio (including within JSON bodies) ought to work.
+
+Since generic integrations don't stream text in (but can stream audio out) Ultravox has to buffer input text
+before sending it to your provider, which means slightly higher agent response times and possible audio
+discontinuities at sentence boundaries.
+
+Additionally since generic integrations don't provide audio timing information, transcript timing must be approximated.
+Once Ultravox has a full generation (and therefore the true audio duration), it assumes each character requires
+the same duration and approximates transcripts based on that. While the first generation is still streaming, Ultravox
+relies on an estimated words-per-minute speaking rate to approximate transcripts.
+
+### Deepgram
+
+Deepgram's latest Aura-2 model claims to be in line with other providers in terms of quality. However, it isn't supported
+in their streaming API yet and Ultravox has no special integration with it yet as a result. That said, you can use our
+"generic" ExternalVoice to give Deepgram a try now using their REST API.
+
+```json
+{
+  "url": "https://api.deepgram.com/v1/speak?model=aura-2-asteria-en&encoding=linear16&sample_rate=48000&container=none",
+  "headers": {
+    "Authorization": "Token YOUR_DEEPGRAM_API_KEY",
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "text": "{text}"
+  },
+  "responseSampleRate": 48000
+}
+```
+
+### Google
+
+Google's TTS API returns json, so it requires an extra `jsonAudioFieldPath` in your generic ExternalVoice.
+
+```json
+{
+  "url": "https://texttospeech.googleapis.com/v1/text:synthesize",
+  "headers": {
+    "Authorization": "Bearer YOUR_GOOGLE_SERVICE_ACCOUNT_CREDENTIALS",
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "input": {"text": "{text}"},
+    "voice": {
+      "languageCode": "en-US",
+      "name": "en-US-Chirp3-HD-Charon"
+    },
+    "audioConfig": {
+      "audioEncoding": "LINEAR16",
+      "speakingRate": 1.0,
+      "sampleRateHertz": 48000
+    }
+  },
+  "responseSampleRate": 48000,
+  "jsonAudioFieldPath": "audioContent"
+}
+```
+
+### Inworld
+Inworld's TTS API returns json, so it requires an extra `jsonAudioFieldPath` field. To use the streaming endpoint, you'll also need to override the `responseMimeType` field so we know to treat the response as [json lines](https://jsonlines.org/).
+
+```json
+{
+  "url": "https://api.inworld.ai/tts/v1/voice:stream",
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "Basic YOUR_INWORLD_BASIC_API_KEY"
+  },
+  "body": {
+    "voiceId": "Hades",
+    "modelId": "inworld-tts-1",
+    "text": "{text}",
+    "audioConfig": {
+        "audioEncoding": "LINEAR16",
+        "speakingRate": 1.0,
+        "sampleRateHertz": 48000
+    }
+  },
+  "responseSampleRate": 48000,
+  "responseMimeType": "application/jsonl",
+  "jsonAudioFieldPath": "result.audioContent"
+}
+```
+
+### OpenAI
+
+OpenAI also has a TTS API you can use with our generic ExternalVoice option.
+
+```json
+{
+  "url": "https://api.openai.com/v1/audio/speech",
+  "headers": {
+    "Authorization": "Bearer YOUR_OPENAI_API_KEY",
+    "Content-Type": "application/json",
+  },
+  "body": {
+    "input": "{text}",
+    "model": "gpt-4o-mini-tts",
+    "voice": "shimmer",
+    "response_format": "pcm",
+    "speed": 1.0
+  },
+  "responseSampleRate": 24000
+}
+```
+
+### Orpheus
+
+Orpheus is an open-source TTS model with a Llama 3 backbone. Along with several similar models, Orpheus
+likely represents the next generation of realism for AI voices. They've partnered with baseten to provide a
+simple [self-hosting option](https://www.baseten.co/library/orpheus-tts/) you can set up for yourself.
+
+You can use a generic ExternalVoice with your self-hosted Orpheus instance:
+
+```json
+{
+  "url": "YOUR_BASETEN_DEPLOYMENT_URL",
+  "headers": {
+    "Authorization": "Api-Key YOUR_BASETEN_API_KEY",
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "prompt": "{text}",
+    "request_id": "SOME_UUID",
+    "max_tokens": 4096,
+    "voice": "tara",
+    "stop_token_ids": [128258, 128009]
+  },
+  "responseSampleRate": 24000,
+  "responseMimeType": "audio/l16"
+}
+```
+
+### Resemble
+
+Resemble also has a TTS API you can use with our generic ExternalVoice option.
+
+```json
+{
+  "url": "https://p.cluster.resemble.ai/stream",
+  "headers": {
+    "Authorization": "Bearer YOUR_RESEMBLE_API_KEY",
+    "Content-Type": "application/json",
+    "Accept": "audio/wav"
+  },
+  "body": {
+    "data": "{text}",
+    "voice_uuid": "0842fdf9",
+    "precision": "PCM_16",
+    "sample_rate": 44100
+  },
+  "responseSampleRate": 44100
+}
+```
+
+### Rime
+
+Rime provides a [spell()](https://docs.rime.ai/api-reference/spell) tool to help nail the pronunciation of unique IDs, email addresses, etc.
+
+```json
+{
+  "url": "https://users.rime.ai/v1/rime-tts",
+  "headers": {
+    "Authorization": "Bearer YOUR_RIME_API_KEY",
+    "Content-Type": "application/json",
+    "Accept": "audio/pcm"
+  },
+  "body": {
+    "text": "{text}",
+    "repetition_penalty": 1.5,
+    "top_p": 1,
+    "speaker": "luna",
+    "modelId": "arcana",
+    "samplingRate": 24000,
+    "max_tokens": 1200,
+    "temperature": 0.5
+  },
+  "responseSampleRate": 24000
+}
+```
+
+### Sarvam
+Sarvam's TTS API returns json, so it requires an extra `jsonAudioFieldPath` field in your generic ExternalVoice.
+
+```json
+{
+  "url": "https://api.sarvam.ai/text-to-speech",
+  "headers": {
+    "Content-Type": "application/json",
+    "api-subscription-key": "YOUR_SARVAM_API_KEY"
+  },
+  "body": {
+    "text": "{text}",
+    "targetLanguageCode": "en-IN",
+    "speaker": "anushka",
+    "model": "bulbul:v2",
+    "pace": 1,
+    "speechSampleRate": 24000,
+    "outputAudioCodec": "linear16"
+  },
+  "responseSampleRate": 24000,
+  "jsonAudioFieldPath": "audios"
+}
+```
+
+
+## Debugging
+
+If you start a call with an external voice and don't hear anything from the agent, your external voice is
+probably misconfigured. You can figure out what's wrong using the [call event API](/api-reference/calls/calls-events-list).
+Events are also visible when viewing the call in the Ultravox console.  Here are some common issues and their resolutions:
+
+| Example error text                                                                                                         | Provider                   | Resolution                                                                                                                                                                                                                                                                      |
+| -------------------------------------------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Requested output format pcm_44100 (PCM at 44100hz) is only allowed for Pro tier and above.`                               | ElevenLabs                 | Your ElevenLabs subscription limits your generation sample rate. Find the maximum sample rate allowed for your subscription on [their pricing page](https://elevenlabs.io/pricing) (you'll need to click "Show API details") and then set maxSampleRate on your voice to match. |
+| `A model with requested ID does not exist`                                                                                 | ElevenLabs                 | Your model name is wrong. See [their model page](https://elevenlabs.io/docs/models#models-overview) for the correct ids.                                                                                                                                                        |
+| `A voice with voice_id 2bNrEsM0omyhLiEyOwqY does not exist.`                                                               | ElevenLabs                 | The voiceId you provided doesn't correspond to a voice in your ElevenLabs library. Make sure your ElevenLabs API key is what you expect and then add the voice to your library in Eleven.                                                                                       |
+| `The API key you used is missing the permission text_to_speech to execute this operation.`                                 | ElevenLabs                 | Check your key and/or upgrade your account with ElevenLabs.                                                                                                                                                                                                                     |
+| `This request exceeds your quota of 10000. You have 14 credits remaining, while 46 credits are required for this request.` | ElevenLabs                 | Check your key and/or upgrade your account with ElevenLabs.                                                                                                                                                                                                                     |
+| `Error initializing streaming TTS connection`                                                                              | ElevenLabs/Cartesia/LMNT   | The provider rejected our attempt to create a streaming connection. This occurs most commonly with ElevenLabs and usually means your API key is incorrect.                                                                                                                      |
+| `HTTP error: 500 Response:{"error": "Internal server error"} Request:{"text": "How can I help you?"}`                      | Generic                    | This is the sort of error you'll get for generic external voices. You should be able to use the complete request and response to reproduce and debug the error with your provider.                                                                                              |
+
+If you can't figure out your issue from the call events or the common issues below, you can also try our [Discord](https://discord.gg/62X253zeWB).

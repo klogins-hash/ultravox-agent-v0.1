@@ -1,0 +1,403 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "maple",
+  "name": "Ultravox Docs",
+  "colors": {
+    "primary": "#5E92FF",
+    "light": "#FBFBFB",
+    "dark": "#5E92FF"
+  },
+  "integrations": {
+    "gtm": {
+        "tagId": "GTM-NC5RGFMZ"
+    }
+  },
+  "favicon": "/favicon.svg",
+  "banner": {
+    "content": "⚠️ SIP Billing Starts November 10, 2025 - See [Ultravox Pricing](https://ultravox.ai/pricing) for details.",
+    "dismissible": false
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": " ",
+            "pages": ["overview"]
+          },
+          {
+            "group": "Getting Started",
+            "icon": "rocket",
+            "pages": [
+              "gettingstarted/how-ultravox-works",
+              "gettingstarted/prompting",
+              "gettingstarted/concurrency",
+              {
+                "group": "Quickstarts",
+                "icon": "person-running-fast",
+                "pages": [
+                  "gettingstarted/quickstart/agent-console",
+                  "gettingstarted/quickstart/telephony-outbound",
+                  "gettingstarted/quickstart/telephony-inbound",
+                  "gettingstarted/quickstart/web-app",
+                  "gettingstarted/quickstart/tools",
+                  "gettingstarted/quickstart/apikeys"
+                ]
+              },
+              {
+                "group": "Examples",
+                "icon": "code",
+                "pages": [
+                  "gettingstarted/examples",
+                  "gettingstarted/examples/outbound-phone-call",
+                  "gettingstarted/examples/inbound-phone-call",
+
+                  {
+                "group": "Tutorials",
+                "icon": "chalkboard-user",
+                "pages": [
+                  "tutorials/callstages",
+                  "tutorials/clienttools"
+                ]
+              }
+                ]
+              },
+              "gettingstarted/getting-help"
+            ]
+          },
+          {
+            "group": "Agents & Calls",
+            "icon": "robot",
+            "pages": [
+              "agents/overview",
+              "agents/building-and-editing-agents",
+              "agents/making-calls",
+              "agents/call-management",
+              "agents/guiding-agents",
+              "agents/call-stages",
+              "agents/testing-and-debugging"
+            ]
+          },
+          {
+            "group": "Telephony",
+            "icon": "square-phone",
+            "tag": "NEW",
+            "pages": [
+              "telephony/overview",
+              "telephony/supported-providers",
+              "telephony/outbound-calls",
+              "telephony/inbound-calls",
+              "telephony/call-transfers",
+              "telephony/ivr-flows",
+              "telephony/sip",
+              "telephony/outbound-call-scheduler"
+            ]
+          },
+          {
+            "group": "Web, Apps, Websockets",
+            "icon": "window",
+            "pages": ["apps/overview", "/apps/sdks", "apps/websockets", "apps/datamessages"]
+          },
+          {
+            "group": "Tools",
+            "icon": "hammer",
+            "pages": [
+              "tools/overview",
+              "tools/built-in-tools",
+              "tools/async-tools",
+              {
+                "group": "Custom Tools",
+                "icon": "gear-complex-code",
+                "pages": [
+                  "tools/custom/overview",
+                  "tools/custom/parameters",
+                  "tools/custom/authentication",
+                  "tools/custom/agent-responses",
+                  "tools/custom/changing-call-state",
+                  "tools/custom/http-vs-client-tools",
+                  "tools/custom/durable-vs-temporary-tools",
+                  "tools/custom/parameter-overrides"
+                ]
+              },
+              {
+                "group": "RAG",
+                "icon": "books",
+                "pages": [
+                  "tools/rag/overview",
+                  "tools/rag/crawling-websites",
+                  "tools/rag/using-static-documents"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Voices",
+            "icon": "microphone",
+            "pages": [
+              "voices/overview",
+              "voices/cloning",
+              "voices/bring-your-own"
+            ]
+          },
+          {
+            "group": "Webhooks",
+            "icon": "webhook",
+            "pages": [
+              "webhooks/overview",
+              "webhooks/available-webhooks",
+              "webhooks/errors-and-retries",
+              "webhooks/securing-webhooks"
+            ]
+          },
+          {
+            "group": "Noise & VAD",
+            "icon": "waveform-lines",
+            "pages": [
+              "noise/overview",
+              "noise/understanding-vad",
+              "noise/handling-background-noise",
+              "noise/handling-background-speakers"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api-reference/introduction"
+            ]
+          },
+          {
+            "group": "Accounts",
+            "pages": [
+              "api-reference/accounts/accounts-me-get",
+              "api-reference/accounts/accounts-me-usage-calls-get",
+              "api-reference/accounts/accounts-me-tts-api-keys-partial-update",
+              "api-reference/accounts/accounts-me-tts-api-keys-retrieve",
+              "api-reference/accounts/accounts-me-telephony-config-partial-update",
+              "api-reference/accounts/accounts-me-telephony-config-retrieve"
+            ]
+          },
+          {
+            "group": "Agents",
+            "pages": [
+              "api-reference/agents/agents-list",
+              "api-reference/agents/agents-post",
+              "api-reference/agents/agents-get",
+              "api-reference/agents/agents-patch",
+              "api-reference/agents/agents-delete",
+              "api-reference/agents/agents-calls-list",
+              "api-reference/agents/agents-calls-post",
+              {
+                "group": "Scheduled Call Batches",
+                "expanded": true,
+                "tag": "NEW",
+                "pages": [
+                  "api-reference/agents/agents-scheduled-batches-list",
+                  "api-reference/agents/agents-scheduled-batches-post",
+                  "api-reference/agents/agents-scheduled-batches-get",
+                  "api-reference/agents/agents-scheduled-batches-patch",
+                  "api-reference/agents/agents-scheduled-batches-delete",
+                  "api-reference/agents/agents-scheduled-batches-created-calls-list",
+                  "api-reference/agents/agents-scheduled-batches-scheduled-calls-list"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Calls, Messages, Stages",
+            "pages": [
+              "api-reference/calls/overview",
+              "api-reference/calls/calls-list",
+              "api-reference/calls/calls-get",
+              "api-reference/calls/calls-post",
+              "api-reference/calls/calls-delete",
+              "api-reference/calls/calls-messages-list",
+              "api-reference/calls/calls-tools-list",
+              "api-reference/calls/calls-recording-get",
+              "api-reference/calls/calls-stages-list",
+              "api-reference/calls/calls-stages-get",
+              "api-reference/calls/calls-stages-messages-list",
+              "api-reference/calls/calls-stages-tools-list",
+              "api-reference/calls/calls-stages-message-audio-get",
+              "api-reference/calls/calls-deleted-calls-list",
+              "api-reference/calls/calls-deleted-calls-get",
+              "api-reference/calls/calls-events-list",
+              "api-reference/calls/calls-sip-logs-get",
+              "api-reference/calls/calls-send-data-message-post"
+            ]
+          },
+          {
+            "group": "Corpora, Query, Sources",
+            "pages": [
+              "api-reference/corpora/overview",
+              "api-reference/corpora/corpora-list",
+              "api-reference/corpora/corpora-post",
+              "api-reference/corpora/corpora-get",
+              "api-reference/corpora/corpora-patch",
+              "api-reference/corpora/corpora-delete",
+              "api-reference/corpora/corpus-query",
+              "api-reference/corpora/corpora-sources-list",
+              "api-reference/corpora/corpora-sources-post",
+              "api-reference/corpora/corpora-sources-get",
+              "api-reference/corpora/corpora-sources-patch",
+              "api-reference/corpora/corpora-sources-delete",
+              "api-reference/corpora/corpora-sources-documents-list",
+              "api-reference/corpora/corpora-sources-documents-get",
+              "api-reference/corpora/corpora-uploads-post"
+            ]
+          },
+          {
+            "group": "Tools",
+            "pages": [
+              "api-reference/tools/tools-list",
+              "api-reference/tools/tools-get",
+              "api-reference/tools/tools-post",
+              "api-reference/tools/tools-put",
+              "api-reference/tools/tools-delete",
+              "api-reference/tools/tools-history-get",
+              "api-reference/tools/tools-test-post"
+            ]
+          },
+          {
+            "group": "Voices",
+            "pages": [
+              "api-reference/voices/voices-list",
+              "api-reference/voices/voices-get",
+              "api-reference/voices/voices-post",
+              "api-reference/voices/voices-delete",
+              "api-reference/voices/voices-put",
+              "api-reference/voices/voices-patch",
+              "api-reference/voices/voice-preview-post",
+              "api-reference/voices/voices-preview-get"
+            ]
+          },
+          {
+            "group": "Webhooks",
+            "pages": [
+              "api-reference/webhooks/webhooks-list",
+              "api-reference/webhooks/webhooks-get",
+              "api-reference/webhooks/webhooks-post",
+              "api-reference/webhooks/webhooks-put",
+              "api-reference/webhooks/webhooks-patch",
+              "api-reference/webhooks/webhooks-delete"
+            ]
+          },
+          {
+            "group": "SIP Configuration",
+            "pages": [
+              "api-reference/sip/sip-get",
+              "api-reference/sip/sip-partial-update",
+              "api-reference/sip/sip-registrations-create",
+              "api-reference/sip/sip-registrations-list",
+              "api-reference/sip/sip-registrations-get",
+              "api-reference/sip/sip-registrations-partial-update",
+              "api-reference/sip/sip-registrations-delete"
+            ]
+          },
+          {
+            "group": "Schema",
+            "pages": [
+              "api-reference/schema/call-definition",
+              "api-reference/schema/base-tool-definition",
+              "api-reference/schema/datamessages"
+            ]
+          },
+          {
+            "group": "Other",
+            "pages": [
+              "api-reference/other/models-get",
+              "api-reference/other/schema-get"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "SDK Reference",
+        "groups": [
+          {
+            "group": "SDK",
+            "pages": [
+              "sdk-reference/introduction"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Integrations",
+        "groups": [
+          {
+            "group": "Integrations",
+            "pages": [
+              "integrations/voximplant"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Changelog",
+        "groups": [
+          {
+            "group": "Changelog",
+            "pages": [
+              "changelog/news",
+              "changelog/deprecation"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "logo": {
+    "light": "/images/UV Logo Horizontal Black.svg",
+    "dark": "/images/UV Logo Horizontal White.svg"
+  },
+  "api": {
+    "openapi": "https://api.ultravox.ai/api/schema/",
+    "playground": {
+      "display": "interactive"
+    },
+    "mdx": {
+      "server": "https://api.ultravox.ai/api/",
+      "auth": {
+        "method": "key",
+        "name": "X-API-Key"
+      }
+    }
+  },
+  "background": {
+    "decoration": "grid"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Community",
+        "href": "https://discord.gg/62X253zeWB"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Dashboard",
+      "href": "https://app.ultravox.ai?utm_source=docs"
+    }
+  },
+  "footer": {
+    "socials": {
+      "discord": "https://discord.gg/62X253zeWB",
+      "github": "https://github.com/fixie-ai/ultravox",
+      "x": "https://x.com/fixieai"
+    }
+  },
+  "fonts": {
+    "heading": {
+      "family": "Inter"
+    },
+    "body": {
+      "family": "Inter"
+    }
+  }
+}
